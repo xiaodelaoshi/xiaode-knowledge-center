@@ -78,7 +78,7 @@ const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'Breadcrum
       {videoEmbeds.length > 0 && <section class="article-videos" aria-labelledby="video-title">
         <div class="video-heading"><small>WATCH</small><h2 id="video-title">影音內容</h2></div>
         <div class="video-grid">{videoEmbeds.map((video) => video && <figure class="video-card"><div class="video-frame"><iframe src={video.src} title={video.title ?? video.label + ' 影片'} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><figcaption><span>{video.label}</span>{video.title && <strong>{video.title}</strong>}<a href={video.url} target="_blank" rel="noreferrer">前往原平台觀看 ↗</a></figcaption></figure>)}</div>
-      </section>
+      </section>}
       <div class="article-bottom">
         <div class="tags">
           {article.data.tags.map((tag) => <a href={`${base}tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}
