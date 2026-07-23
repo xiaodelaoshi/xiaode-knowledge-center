@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://xiaodelaoshi.github.io/xiaode-knowledge-center/sitemap-index.xml
