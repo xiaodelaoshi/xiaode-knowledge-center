@@ -1,0 +1,98 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchHero from '../components/SearchHero.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { categories, site } from '../data/site';
+const base = import.meta.env.BASE_URL;
+const articles = (await getCollection('articles', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+const featured = articles.filter(({ data }) => data.featured).slice(0, 3);
+---
+<BaseLayout>
+  <section class="hero">
+    <div class="container hero-inner">
+      <p class="eyebrow">XIAODE KNOWLEDGE CENTER</p>
+      <h1>把複雜的知識，<br /><em>說得更簡單。</em></h1>
+      <p class="lead">{site.tagline}</p>
+      <SearchHero />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div><p class="eyebrow">EXPLORE</p><h2>今天想學什麼？</h2></div>
+        <p>從真實工作與生活經驗出發，把值得保存的內容分門別類，讓你需要時能再找到。</p>
+      </div>
+      <div class="category-grid">
+        {categories.map((category, index) => (
+          <a class="category" href={`${base}categories/${category.slug}/`}>
+            <span class="number">{String(index + 1).padStart(2, '0')}</span>
+            <span class="icon">{category.icon}</span>
+            <h3>{category.name}</h3>
+            <p>{category.description}</p>
+            <b>進入分類 →</b>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section latest">
+    <div class="container">
+      <div class="section-head">
+        <div><p class="eyebrow">SELECTED ARTICLES</p><h2>精選文章</h2></div>
+        <a class="button" href={`${base}articles/`}>查看所有文章</a>
+      </div>
+      <div class="article-grid">{featured.map((article) => <ArticleCard article={article} />)}</div>
+    </div>
+  </section>
+
+  <section class="ai-preview">
+    <div class="container preview-grid">
+      <div>
+        <p class="eyebrow">COMING NEXT</p>
+        <h2>未來，你可以直接問小德老師。</h2>
+        <p>我們已經為 AI 知識問答保留介面。第一版先從可靠的文章搜尋開始，未來將依據知識中心內容整理答案，並清楚標示資料來源。</p>
+      </div>
+      <div class="chat">
+        <div class="bubble user">繼承的房屋出售，持有期間怎麼算？</div>
+        <div class="bubble answer"><span>德</span><p><strong>小德老師知識助手</strong><br />這個問題要先確認被繼承人原始取得日、適用新舊制，以及能否合併計算持有期間……</p></div>
+        <small>AI 問答功能預留示意</small>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .hero { position: relative; display: grid; min-height: 690px; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 40%, #fff 0, #fbfaf6 55%, #f1eadf 100%); }
+  .hero::before, .hero::after { content: ""; position: absolute; border: 1px solid rgba(199,150,66,.18); border-radius: 50%; }
+  .hero::before { width: 620px; height: 620px; left: -390px; top: 80px; }
+  .hero::after { width: 430px; height: 430px; right: -270px; top: 130px; }
+  .hero-inner { position: relative; z-index: 1; text-align: center; }
+  h1 em { color: var(--gold); font-family: "Noto Serif TC", serif; font-style: normal; font-weight: 600; }
+  .lead { max-width: 650px; margin: 24px auto 0; color: var(--muted); font-size: 1.08rem; }
+  .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+  .category { position: relative; min-height: 285px; padding: 25px; border: 1px solid var(--line); background: white; border-radius: var(--radius); overflow: hidden; transition: .22s; }
+  .category:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: var(--shadow); }
+  .number { position: absolute; right: 22px; top: 18px; color: #d8dee2; font-family: serif; font-size: 2.5rem; }
+  .icon { display: grid; width: 46px; height: 46px; place-items: center; color: white; background: var(--navy); border-radius: 14px; font-weight: 900; }
+  .category h3 { margin: 30px 0 8px; font-size: 1.28rem; }
+  .category p { color: var(--muted); font-size: .9rem; }
+  .category b { position: absolute; bottom: 22px; color: var(--gold); font-size: .82rem; }
+  .latest { background: white; }
+  .article-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .ai-preview { padding: 90px 0; color: white; background: var(--navy); }
+  .ai-preview h2 { color: white; }
+  .ai-preview p { color: rgba(255,255,255,.72); }
+  .preview-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 70px; align-items: center; }
+  .chat { padding: 24px; color: var(--ink); background: #f7f7f5; border-radius: 24px; }
+  .bubble { margin-bottom: 14px; padding: 14px 18px; border-radius: 17px; }
+  .user { width: fit-content; margin-left: auto; background: #e7e8e4; }
+  .answer { display: flex; gap: 12px; background: white; }
+  .answer span { display: grid; flex: 0 0 34px; height: 34px; place-items: center; color: white; background: var(--navy); border-radius: 10px; }
+  .answer p { margin: 0; color: var(--ink); font-size: .9rem; }
+  .chat small { color: var(--muted); }
+  @media (max-width: 850px) { .category-grid, .article-grid { grid-template-columns: repeat(2, 1fr); } .preview-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .hero { min-height: 640px; } .category-grid, .article-grid { grid-template-columns: 1fr; } }
+</style>

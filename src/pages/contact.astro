@@ -1,0 +1,8 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+<BaseLayout title="聯絡小德老師">
+  <section class="contact"><div class="container grid"><div><p class="eyebrow">LET'S CONNECT</p><h1>有問題，<br />我們慢慢聊。</h1><p>歡迎透過 Facebook、Instagram 或 LINE 與小德老師聯絡。第一版先使用社群平台聯絡；之後可再加入表單、預約與電子報。</p></div><div class="channels"><a href={site.social.facebook} target="_blank" rel="noreferrer"><b>Facebook</b><span>前往主帳號 →</span></a><a class="pending" href={site.social.instagram}><b>Instagram</b><span>連結待補</span></a><a class="pending" href={site.social.line}><b>LINE 官方帳號</b><span>連結待補</span></a></div></div></section>
+</BaseLayout>
+<style>.contact{padding:120px 0;background:linear-gradient(135deg,#f1eadf,#fff)}.grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:80px;align-items:center}.contact h1{font-size:clamp(2.7rem,6vw,4.8rem)}.contact p{max-width:540px;color:var(--muted)}.channels{display:grid;gap:14px}.channels a{display:flex;justify-content:space-between;align-items:center;padding:24px;border:1px solid var(--line);background:white;border-radius:18px;box-shadow:0 10px 30px rgba(23,54,83,.06)}.channels a:hover{border-color:var(--gold)}.channels span{color:var(--gold);font-size:.85rem}.channels .pending{opacity:.6;pointer-events:none}@media(max-width:760px){.contact{padding:80px 0}.grid{grid-template-columns:1fr;gap:35px}}</style>
