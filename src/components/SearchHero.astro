@@ -1,0 +1,22 @@
+---
+const { compact = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<form class:list={['ask', { compact }]} action={`${base}search/`} method="get">
+  <label for="q">今天想了解什麼？</label>
+  <div class="field">
+    <input id="q" name="q" type="search" placeholder="例如：房地合一稅怎麼算？" autocomplete="off" />
+    <button type="submit" aria-label="開始搜尋">搜尋</button>
+  </div>
+  {!compact && <p>試試看：買房注意事項、繼承房屋、房仲 AI、團隊管理</p>}
+</form>
+<style>
+  .ask { width: min(100%, 830px); margin: 38px auto 0; }
+  label { display: block; margin-bottom: 13px; color: var(--navy); font-size: 1.02rem; font-weight: 800; }
+  .field { display: flex; padding: 9px; border: 1px solid rgba(23,54,83,.16); background: white; border-radius: 22px; box-shadow: 0 28px 70px rgba(23,54,83,.14); }
+  input { width: 100%; min-width: 0; padding: 14px 17px; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: clamp(1rem, 2vw, 1.15rem); }
+  button { width: 58px; border: 0; color: white; background: var(--navy); border-radius: 15px; cursor: pointer; font-size: 0; }
+  button::after { content: "→"; font-size: 1.35rem; }
+  p { margin: 14px 0 0; color: var(--muted); font-size: .84rem; }
+  .compact { margin-top: 24px; }
+</style>
