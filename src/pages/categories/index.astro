@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { categories } from '../../data/site';
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="知識分類">
+  <header class="page-head"><div class="container"><p class="eyebrow">KNOWLEDGE MAP</p><h1>六大知識分類</h1><p>依照現在的需要，選一個入口開始。</p></div></header>
+  <section class="section"><div class="container category-list">{categories.map((category) => <a href={`${base}categories/${category.slug}/`}><span>{category.icon}</span><div><h2>{category.name}</h2><p>{category.description}</p></div><b>→</b></a>)}</div></section>
+</BaseLayout>
+<style>
+  .page-head{padding:90px 0 55px;text-align:center;background:#f2eee6}.page-head h1{font-size:clamp(2.4rem,5vw,4rem)}.page-head p:last-child{color:var(--muted)}
+  .category-list{display:grid;grid-template-columns:1fr 1fr;gap:18px}.category-list a{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;padding:28px;border:1px solid var(--line);background:white;border-radius:var(--radius)}.category-list span{display:grid;width:52px;height:52px;place-items:center;color:white;background:var(--navy);border-radius:15px;font-weight:900}.category-list h2{font-size:1.3rem}.category-list p{margin:5px 0 0;color:var(--muted)}.category-list b{color:var(--gold);font-size:1.4rem}@media(max-width:700px){.category-list{grid-template-columns:1fr}}
+</style>
