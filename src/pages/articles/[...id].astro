@@ -14,30 +14,31 @@ const base = import.meta.env.BASE_URL;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const authorUrl = new URL(`${base}about/`, Astro.site);
 const imageUrl = new URL(`${base}xiaode-brand-hero.png`, Astro.site);
+const allArticles = (await getCollection('articles', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+const currentIndex = allArticles.findIndex((item) => item.id === article.id);
+const previousArticle = currentIndex >= 0 ? allArticles[currentIndex + 1] : undefined;
+const nextArticle = currentIndex > 0 ? allArticles[currentIndex - 1] : undefined;
+const stableNumber = (value: string) => Array.from(value).reduce((total, char) => ((total * 31) + (char.codePointAt(0) ?? 0)) >>> 0, 7);
+const currentTags = new Set(article.data.tags);
+const relatedArticles = allArticles.filter((item) => item.id !== article.id).map((item) => ({
+  item,
+  score: (item.data.tags.filter((tag) => currentTags.has(tag)).length * 10) + (item.data.category === article.data.category ? 3 : 0),
+  rotation: stableNumber(`${article.id}:${item.id}`),
+})).sort((a, b) => b.score - a.score || a.rotation - b.rotation).slice(0, 3).map(({ item }) => item);
 const articleSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+  '@context': 'https://schema.org', '@type': 'BlogPosting',
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonical.href },
-  headline: article.data.title,
-  description: article.data.description,
-  image: [imageUrl.href],
-  datePublished: article.data.publishedAt.toISOString(),
-  dateModified: (article.data.updatedAt ?? article.data.publishedAt).toISOString(),
-  author: { '@type': 'Person', name: '小德老師', url: authorUrl.href },
-  publisher: { '@type': 'Person', name: '小德老師', url: authorUrl.href },
-  articleSection: article.data.category,
-  keywords: article.data.tags.join(', '),
-  inLanguage: 'zh-TW',
+  headline: article.data.title, description: article.data.description, image: [imageUrl.href],
+  datePublished: article.data.publishedAt.toISOString(), dateModified: (article.data.updatedAt ?? article.data.publishedAt).toISOString(),
+  author: { '@type': 'Person', name: '小德老師', url: authorUrl.href }, publisher: { '@type': 'Person', name: '小德老師', url: authorUrl.href },
+  articleSection: article.data.category, keywords: article.data.tags.join(', '), inLanguage: 'zh-TW',
 };
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: '首頁', item: new URL(base, Astro.site).href },
-    { '@type': 'ListItem', position: 2, name: article.data.category, item: new URL(`${base}categories/${category?.slug}/`, Astro.site).href },
-    { '@type': 'ListItem', position: 3, name: article.data.title, item: canonical.href },
-  ],
-};
+const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: '首頁', item: new URL(base, Astro.site).href },
+  { '@type': 'ListItem', position: 2, name: article.data.category, item: new URL(`${base}categories/${category?.slug}/`, Astro.site).href },
+  { '@type': 'ListItem', position: 3, name: article.data.title, item: canonical.href },
+]};
 ---
 <BaseLayout title={article.data.title} description={article.data.description} type="article">
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
@@ -65,30 +66,18 @@ const breadcrumbSchema = {
           <strong>覺得有幫助嗎？</strong>
           <div class="actions">
             <a class="button primary" href="https://m.me/zhuang.xiao.de.463208" target="_blank" rel="noreferrer">私訊小德老師</a>
-            {article.data.facebookUrl && (
-              <a class="button" href={article.data.facebookUrl} target="_blank" rel="noreferrer">查看 Facebook 原文</a>
-            )}
+            {article.data.facebookUrl && <a class="button" href={article.data.facebookUrl} target="_blank" rel="noreferrer">查看 Facebook 原文</a>}
           </div>
         </div>
-        <section class="comments" aria-labelledby="comment-title">
-          <div class="comment-head"><div><small>DISCUSSION</small><h2 id="comment-title">留下你的想法</h2></div><p>使用 GitHub 帳號留言；站長可在 Discussions 管理或刪除不當內容。</p></div>
-          <script is:inline
-            src="https://giscus.app/client.js"
-            data-repo="xiaodelaoshi/xiaode-knowledge-center"
-            data-repo-id="R_kgDOThDa9g"
-            data-category="Announcements"
-            data-category-id="DIC_kwDOThDa9s4DBzNn"
-            data-mapping="pathname"
-            data-strict="0"
-            data-reactions-enabled="1"
-            data-emit-metadata="0"
-            data-input-position="top"
-            data-theme="light"
-            data-lang="zh-TW"
-            crossorigin="anonymous"
-            async>
-          </script>
-        </section>
+        {relatedArticles.length > 0 && <section class="related" aria-labelledby="related-title">
+          <div class="related-head"><small>KEEP READING</small><h2 id="related-title">延伸閱讀｜你可能也想了解</h2><p>依照這篇文章的分類與標籤，為你挑選相關內容。</p></div>
+          <div class="related-grid">{relatedArticles.map((item) => <a class="related-card" href={`${base}articles/${item.id}/`}><span>{item.data.category}</span><h3>{item.data.title}</h3><p>{item.data.description}</p><strong>閱讀文章 →</strong></a>)}</div>
+        </section>}
+        {(previousArticle || nextArticle) && <nav class="article-nav" aria-label="上一篇與下一篇">
+          {previousArticle ? <a href={`${base}articles/${previousArticle.id}/`}><small>上一篇</small><strong>{previousArticle.data.title}</strong></a> : <span />}
+          {nextArticle ? <a class="next" href={`${base}articles/${nextArticle.id}/`}><small>下一篇</small><strong>{nextArticle.data.title}</strong></a> : <span />}
+        </nav>}
+        <section class="comments" aria-labelledby="comment-title"><div class="comment-head"><div><small>DISCUSSION</small><h2 id="comment-title">留下你的想法</h2></div><p>使用 GitHub 帳號留言；站長可在 Discussions 管理或刪除不當內容。</p></div><script is:inline src="https://giscus.app/client.js" data-repo="xiaodelaoshi/xiaode-knowledge-center" data-repo-id="R_kgDOThDa9g" data-category="Announcements" data-category-id="DIC_kwDOThDa9s4DBzNn" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="zh-TW" crossorigin="anonymous" async></script></section>
       </div>
     </div>
   </article>
@@ -99,18 +88,31 @@ const breadcrumbSchema = {
   .crumb { color: var(--gold); font-size: .85rem; font-weight: 800; }
   .article-head h1 { max-width: 900px; margin: 18px auto; font-size: clamp(2.15rem,5vw,4.1rem); }
   .summary { max-width: 700px; margin: 0 auto; color: var(--muted); font-size: 1.08rem; }
-  .details { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; margin-top: 25px; color: var(--muted); font-size: .8rem; }
-  .details a { color: var(--navy); font-weight: 800; }
-  .article-bottom { max-width: 760px; margin: 60px auto 0; padding-top: 28px; border-top: 1px solid var(--line); }
+  .details { display: flex; justify-content: center; gap: 22px; margin-top: 25px; color: var(--muted); font-size: .8rem; }
+  .article-bottom { max-width: 880px; margin: 60px auto 0; padding-top: 28px; border-top: 1px solid var(--line); }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tags a { padding: 6px 12px; color: var(--navy); background: var(--gold-soft); border-radius: 999px; font-size: .78rem; }
   .share { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-top: 30px; padding: 24px; background: white; border-radius: 18px; box-shadow: var(--shadow); }
   .actions { display: flex; flex-wrap: wrap; gap: 9px; }
+  .related { margin-top: 42px; }
+  .related-head small { color: var(--gold); font-weight: 900; letter-spacing: .14em; }
+  .related-head h2 { margin: 6px 0 4px; font-size: clamp(1.55rem,3vw,2rem); }
+  .related-head p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .related-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 20px; }
+  .related-card { display: flex; min-height: 240px; padding: 22px; color: inherit; background: white; border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); flex-direction: column; transition: transform .2s ease; }
+  .related-card:hover { transform: translateY(-4px); }
+  .related-card span,.related-head small,.article-nav small { color: var(--gold); font-weight: 900; }
+  .related-card h3 { margin: 10px 0; color: var(--navy); font-size: 1.05rem; line-height: 1.45; }
+  .related-card p { margin: 0 0 18px; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+  .related-card strong { margin-top: auto; color: var(--navy); font-size: .82rem; }
+  .article-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+  .article-nav a { display: flex; min-height: 100px; padding: 18px 20px; color: var(--navy); background: var(--gold-soft); border-radius: 16px; flex-direction: column; }
+  .article-nav a.next { text-align: right; align-items: flex-end; }
+  .article-nav strong { font-size: .88rem; line-height: 1.5; }
   .comments { margin-top: 32px; padding: 28px; border: 1px solid var(--line); background: white; border-radius: 20px; box-shadow: var(--shadow); }
   .comment-head { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
-  .comment-head small { color: var(--gold); font-weight: 900; letter-spacing: .14em; }
   .comment-head h2 { margin: 6px 0 18px; font-size: 1.45rem; }
   .comment-head p { max-width: 330px; margin: 5px 0 18px; color: var(--muted); font-size: .85rem; }
-  .comments :global(.giscus), .comments :global(.giscus-frame) { width: 100%; }
+  @media(max-width:760px){.related-grid,.article-nav{grid-template-columns:1fr}.related-card{min-height:auto}.article-nav a.next{text-align:left;align-items:flex-start}}
   @media(max-width:600px){.share,.comment-head{align-items:flex-start;flex-direction:column}.comments{padding:18px}}
 </style>
