@@ -65,7 +65,8 @@ const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
       <div class="video-feature"><div class="home-video-frame">{latestVideoEmbed ? <iframe src={latestVideoEmbed} title={latestVideo.title ?? latestVideoArticle.data.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> : <a href={latestVideo.url} target="_blank" rel="noreferrer">前往原平台觀看影片</a>}</div><div class="video-copy"><span>{latestVideo.platform.toUpperCase()}</span><h3>{latestVideoArticle.data.title}</h3><p>{latestVideoArticle.data.description}</p><div class="video-actions"><a class="button primary" href={`${base}articles/${latestVideoArticle.id}/`}>觀看影片與文章</a><a class="button" href={latestVideo.url} target="_blank" rel="noreferrer">原平台觀看 ↗</a></div></div></div>
     </div>
   </section>
-
+}
+  
   <section class="section latest">
     <div class="container">
       <div class="section-head">
