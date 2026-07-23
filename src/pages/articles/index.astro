@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+const articles = (await getCollection('articles', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+---
+<BaseLayout title="所有文章" description="瀏覽小德老師知識中心的所有文章。">
+  <header class="page-head"><div class="container"><p class="eyebrow">ALL ARTICLES</p><h1>所有文章</h1><p>把值得保存的經驗，整理成需要時找得到的知識。</p></div></header>
+  <section class="section"><div class="container article-grid">{articles.map((article) => <ArticleCard article={article} />)}</div></section>
+</BaseLayout>
+<style>
+  .page-head { padding: 90px 0 55px; text-align: center; background: #f2eee6; }
+  .page-head h1 { font-size: clamp(2.4rem,5vw,4rem); }
+  .page-head p:last-child { color: var(--muted); }
+  .article-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+  @media(max-width:850px){.article-grid{grid-template-columns:repeat(2,1fr)}} @media(max-width:560px){.article-grid{grid-template-columns:1fr}}
+</style>
