@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { categoryByName, site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles', ({ data }) => !data.draft);
+  return articles.map((article) => ({ params: { id: article.id }, props: { article } }));
+}
+const { article } = Astro.props;
+const { Content } = await render(article);
+const category = categoryByName(article.data.category);
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title={article.data.title} description={article.data.description}>
+  <article data-pagefind-body>
+    <header class="article-head">
+      <div class="container narrow">
+        <a class="crumb" href={`${base}categories/${category?.slug}/`}>{article.data.category}</a>
+        <h1 data-pagefind-meta="title">{article.data.title}</h1>
+        <p class="summary">{article.data.description}</p>
+        <div class="details">
+          <time datetime={article.data.publishedAt.toISOString()}>發布於 {article.data.publishedAt.toLocaleDateString('zh-TW')}</time>
+          <span>小德老師</span>
+        </div>
+      </div>
+    </header>
+    <div class="section">
+      <div class="prose"><Content /></div>
+      <div class="article-bottom">
+        <div class="tags">
+          {article.data.tags.map((tag) => <a href={`${base}tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}
+        </div>
+        <div class="share">
+          <strong>覺得有幫助嗎？</strong>
+          <a class="button primary" href={site.social.facebook} target="_blank" rel="noreferrer">到 Facebook 繼續交流</a>
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+<style>
+  .article-head { padding: 90px 0 65px; text-align: center; background: linear-gradient(145deg,#f0eadf,#fff); }
+  .narrow { max-width: 900px; }
+  .crumb { color: var(--gold); font-size: .85rem; font-weight: 800; }
+  .article-head h1 { max-width: 900px; margin: 18px auto; font-size: clamp(2.15rem,5vw,4.1rem); }
+  .summary { max-width: 700px; margin: 0 auto; color: var(--muted); font-size: 1.08rem; }
+  .details { display: flex; justify-content: center; gap: 22px; margin-top: 25px; color: var(--muted); font-size: .8rem; }
+  .article-bottom { max-width: 760px; margin: 60px auto 0; padding-top: 28px; border-top: 1px solid var(--line); }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tags a { padding: 6px 12px; color: var(--navy); background: var(--gold-soft); border-radius: 999px; font-size: .78rem; }
+  .share { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-top: 30px; padding: 24px; background: white; border-radius: 18px; box-shadow: var(--shadow); }
+  @media(max-width:600px){.share{align-items:flex-start;flex-direction:column}}
+</style>
