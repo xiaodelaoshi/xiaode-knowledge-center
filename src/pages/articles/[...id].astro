@@ -11,8 +11,37 @@ const { article } = Astro.props;
 const { Content } = await render(article);
 const category = categoryByName(article.data.category);
 const base = import.meta.env.BASE_URL;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const authorUrl = new URL(`${base}about/`, Astro.site);
+const imageUrl = new URL(`${base}xiaode-brand-hero.png`, Astro.site);
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonical.href },
+  headline: article.data.title,
+  description: article.data.description,
+  image: [imageUrl.href],
+  datePublished: article.data.publishedAt.toISOString(),
+  dateModified: (article.data.updatedAt ?? article.data.publishedAt).toISOString(),
+  author: { '@type': 'Person', name: '小德老師', url: authorUrl.href },
+  publisher: { '@type': 'Person', name: '小德老師', url: authorUrl.href },
+  articleSection: article.data.category,
+  keywords: article.data.tags.join(', '),
+  inLanguage: 'zh-TW',
+};
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首頁', item: new URL(base, Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: article.data.category, item: new URL(`${base}categories/${category?.slug}/`, Astro.site).href },
+    { '@type': 'ListItem', position: 3, name: article.data.title, item: canonical.href },
+  ],
+};
 ---
-<BaseLayout title={article.data.title} description={article.data.description}>
+<BaseLayout title={article.data.title} description={article.data.description} type="article">
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   <article data-pagefind-body>
     <header class="article-head">
       <div class="container narrow">
@@ -21,7 +50,8 @@ const base = import.meta.env.BASE_URL;
         <p class="summary">{article.data.description}</p>
         <div class="details">
           <time datetime={article.data.publishedAt.toISOString()}>發布於 {article.data.publishedAt.toLocaleDateString('zh-TW')}</time>
-          <span>小德老師</span>
+          <a href={authorUrl}>作者：小德老師</a>
+          {article.data.updatedAt && <span>更新於 {article.data.updatedAt.toLocaleDateString('zh-TW')}</span>}
         </div>
       </div>
     </header>
@@ -69,7 +99,8 @@ const base = import.meta.env.BASE_URL;
   .crumb { color: var(--gold); font-size: .85rem; font-weight: 800; }
   .article-head h1 { max-width: 900px; margin: 18px auto; font-size: clamp(2.15rem,5vw,4.1rem); }
   .summary { max-width: 700px; margin: 0 auto; color: var(--muted); font-size: 1.08rem; }
-  .details { display: flex; justify-content: center; gap: 22px; margin-top: 25px; color: var(--muted); font-size: .8rem; }
+  .details { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; margin-top: 25px; color: var(--muted); font-size: .8rem; }
+  .details a { color: var(--navy); font-weight: 800; }
   .article-bottom { max-width: 760px; margin: 60px auto 0; padding-top: 28px; border-top: 1px solid var(--line); }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tags a { padding: 6px 12px; color: var(--navy); background: var(--gold-soft); border-radius: 999px; font-size: .78rem; }
