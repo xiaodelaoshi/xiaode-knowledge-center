@@ -13,6 +13,11 @@ const articles = defineCollection({
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
     facebookUrl: z.string().url().optional(),
+    videos: z.array(z.object({
+      platform: z.enum(['facebook', 'youtube', 'instagram', 'tiktok', 'douyin']),
+      url: z.string().url(),
+      title: z.string().optional(),
+    })).default([]),
   }),
 });
 
