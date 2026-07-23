@@ -8,10 +8,35 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  type?: 'website' | 'article';
 }
-const { title, description = site.description, image } = Astro.props;
+const { title, description = site.description, image = `${import.meta.env.BASE_URL}xiaode-brand-hero.png`, type = 'website' } = Astro.props;
 const pageTitle = title ? `${title}｜${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrl = new URL(image, Astro.site);
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': new URL(`${import.meta.env.BASE_URL}#website`, Astro.site).href,
+      url: new URL(import.meta.env.BASE_URL, Astro.site).href,
+      name: site.name,
+      description: site.description,
+      inLanguage: 'zh-TW',
+      publisher: { '@id': new URL(`${import.meta.env.BASE_URL}about/#person`, Astro.site).href },
+    },
+    {
+      '@type': 'Person',
+      '@id': new URL(`${import.meta.env.BASE_URL}about/#person`, Astro.site).href,
+      name: '小德老師',
+      url: new URL(`${import.meta.env.BASE_URL}about/`, Astro.site).href,
+      image: imageUrl.href,
+      sameAs: [site.social.facebook],
+      knowsAbout: ['房地產', '不動產稅務', '生活法律', '房仲實戰', '經營管理', 'AI與自媒體'],
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang="zh-Hant">
@@ -21,14 +46,21 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
     <link rel="canonical" href={canonical} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="zh_TW" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    {image && <meta property="og:image" content={new URL(image, Astro.site)} />}
-    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content={pageTitle} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
   </head>
   <body>
