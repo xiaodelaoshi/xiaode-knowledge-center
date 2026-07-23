@@ -41,14 +41,27 @@ const base = import.meta.env.BASE_URL;
           </div>
         </div>
         <section class="comments" aria-labelledby="comment-title">
-          <div class="comment-head"><div><small>DISCUSSION</small><h2 id="comment-title">留下你的想法</h2></div><p>使用 Facebook 帳號留言，也可以直接私訊小德老師。</p></div>
-          <div id="fb-root"></div>
-          <div class="fb-comments" data-href={Astro.url.href} data-width="100%" data-numposts="8" data-order-by="reverse_time"></div>
+          <div class="comment-head"><div><small>DISCUSSION</small><h2 id="comment-title">留下你的想法</h2></div><p>使用 GitHub 帳號留言；站長可在 Discussions 管理或刪除不當內容。</p></div>
+          <script is:inline
+            src="https://giscus.app/client.js"
+            data-repo="xiaodelaoshi/xiaode-knowledge-center"
+            data-repo-id="R_kgDOThDa9g"
+            data-category="Announcements"
+            data-category-id="DIC_kwDOThDa9s4DBzNn"
+            data-mapping="pathname"
+            data-strict="0"
+            data-reactions-enabled="1"
+            data-emit-metadata="0"
+            data-input-position="top"
+            data-theme="light"
+            data-lang="zh-TW"
+            crossorigin="anonymous"
+            async>
+          </script>
         </section>
       </div>
     </div>
   </article>
-  <script is:inline async defer crossorigin="anonymous" src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v23.0"></script>
 </BaseLayout>
 <style>
   .article-head { padding: 90px 0 65px; text-align: center; background: linear-gradient(145deg,#f0eadf,#fff); }
@@ -67,6 +80,6 @@ const base = import.meta.env.BASE_URL;
   .comment-head small { color: var(--gold); font-weight: 900; letter-spacing: .14em; }
   .comment-head h2 { margin: 6px 0 18px; font-size: 1.45rem; }
   .comment-head p { max-width: 330px; margin: 5px 0 18px; color: var(--muted); font-size: .85rem; }
-  .fb-comments, .fb-comments span, .fb-comments iframe { width: 100% !important; }
+  .comments :global(.giscus), .comments :global(.giscus-frame) { width: 100%; }
   @media(max-width:600px){.share,.comment-head{align-items:flex-start;flex-direction:column}.comments{padding:18px}}
 </style>
