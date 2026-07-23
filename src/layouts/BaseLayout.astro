@@ -72,6 +72,31 @@ const websiteSchema = {
       <a class="facebook" href={site.social.facebook} target="_blank" rel="noreferrer" aria-label="前往小德老師 Facebook"><span>f</span><b>追蹤 Facebook</b></a>
     </aside>
     <Footer />
+    <div class="visitor-counter" hidden title="每次開啟或重新整理頁面都會重新計數">
+      <span aria-hidden="true">◉</span>
+      <b>累計瀏覽</b>
+      <strong id="site-view-count" aria-live="polite">0</strong>
+      <small>次</small>
+    </div>
+    <script is:inline>
+      (() => {
+        const counter = document.getElementById('site-view-count');
+        const container = counter?.closest('.visitor-counter');
+        if (!counter || !container) return;
+        fetch('https://api.counterapi.dev/v1/xiaode-knowledge-center/site-page-views/up', { cache: 'no-store' })
+          .then((response) => {
+            if (!response.ok) throw new Error('counter unavailable');
+            return response.json();
+          })
+          .then((result) => {
+            const value = Number(result.value ?? result.count);
+            if (!Number.isFinite(value)) throw new Error('invalid counter');
+            counter.textContent = value.toLocaleString('zh-TW');
+            container.hidden = false;
+          })
+          .catch(() => container.remove());
+      })();
+    </script>
   </body>
 </html>
 
@@ -83,5 +108,11 @@ const websiteSchema = {
   .contact-dock .facebook { background: #172d40; }
   .contact-dock span { display: grid; width: 32px; height: 32px; place-items: center; color: #172d40; background: #efc85b; border-radius: 50%; font-weight: 900; }
   .contact-dock b { font-size: .78rem; }
-  @media(max-width:600px) { .contact-dock { right: 12px; bottom: 12px; grid-auto-flow: column; } .contact-dock a { padding-right: 8px; } .contact-dock b { display: none; } }
+  @media(max-width:600px) { .contact-dock { right: 12px; bottom: 12px; grid-auto-flow: column; } .contact-dock a { padding-right: 8px; } .contact-dock b { display: none; } .visitor-counter { right: 12px; bottom: 74px; padding: 8px 11px; } }
+
+  .visitor-counter { position: fixed; z-index: 49; right: 20px; bottom: 142px; display: flex; align-items: center; gap: 7px; padding: 9px 13px; color: #17324a; background: rgba(255,255,255,.88); border: 1px solid rgba(23,50,74,.16); border-radius: 999px; box-shadow: 0 10px 28px rgba(15,48,77,.16); backdrop-filter: blur(8px); font-size: .78rem; }
+  .visitor-counter[hidden] { display: none; }
+  .visitor-counter span { color: #d49a20; font-size: .9rem; }
+  .visitor-counter strong { color: #0f5aa8; font-size: .95rem; font-variant-numeric: tabular-nums; }
+  .visitor-counter small { color: #6b7d8b; }
 </style>
