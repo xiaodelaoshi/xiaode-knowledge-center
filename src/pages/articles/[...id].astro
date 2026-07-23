@@ -26,6 +26,23 @@ const relatedArticles = allArticles.filter((item) => item.id !== article.id).map
   score: (item.data.tags.filter((tag) => currentTags.has(tag)).length * 10) + (item.data.category === article.data.category ? 3 : 0),
   rotation: stableNumber(`${article.id}:${item.id}`),
 })).sort((a, b) => b.score - a.score || a.rotation - b.rotation).slice(0, 3).map(({ item }) => item);
+const toEmbed = (video: { platform: string; url: string; title?: string }) => {
+  let id = '';
+  try {
+    const url = new URL(video.url);
+    if (video.platform === 'youtube') {
+      id = url.hostname.includes('youtu.be') ? url.pathname.split('/').filter(Boolean)[0] : (url.searchParams.get('v') ?? url.pathname.match(/\/(?:shorts|embed)\/([^/?]+)/)?.[1] ?? '');
+      return id ? { ...video, src: 'https://www.youtube-nocookie.com/embed/' + id, label: 'YouTube' } : null;
+    }
+    if (video.platform === 'instagram') return { ...video, src: video.url.split('?')[0].replace(/\/$/, '') + '/embed/', label: 'Instagram Reels' };
+    if (video.platform === 'facebook') return { ...video, src: 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(video.url) + '&show_text=false&width=900', label: 'Facebook' };
+    id = url.pathname.match(/\/video\/(\d+)/)?.[1] ?? '';
+    if (video.platform === 'tiktok' && id) return { ...video, src: 'https://www.tiktok.com/player/v1/' + id, label: 'TikTok' };
+    if (video.platform === 'douyin' && id) return { ...video, src: 'https://open.douyin.com/player/video?vid=' + id, label: '抖音' };
+  } catch {}
+  return null;
+};
+const videoEmbeds = article.data.videos.map(toEmbed).filter(Boolean);
 const articleSchema = {
   '@context': 'https://schema.org', '@type': 'BlogPosting',
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonical.href },
@@ -58,6 +75,10 @@ const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'Breadcrum
     </header>
     <div class="section">
       <div class="prose"><Content /></div>
+      {videoEmbeds.length > 0 && <section class="article-videos" aria-labelledby="video-title">
+        <div class="video-heading"><small>WATCH</small><h2 id="video-title">影音內容</h2></div>
+        <div class="video-grid">{videoEmbeds.map((video) => video && <figure class="video-card"><div class="video-frame"><iframe src={video.src} title={video.title ?? video.label + ' 影片'} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><figcaption><span>{video.label}</span>{video.title && <strong>{video.title}</strong>}<a href={video.url} target="_blank" rel="noreferrer">前往原平台觀看 ↗</a></figcaption></figure>)}</div>
+      </section>
       <div class="article-bottom">
         <div class="tags">
           {article.data.tags.map((tag) => <a href={`${base}tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}
@@ -89,6 +110,17 @@ const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'Breadcrum
   .article-head h1 { max-width: 900px; margin: 18px auto; font-size: clamp(2.15rem,5vw,4.1rem); }
   .summary { max-width: 700px; margin: 0 auto; color: var(--muted); font-size: 1.08rem; }
   .details { display: flex; justify-content: center; gap: 22px; margin-top: 25px; color: var(--muted); font-size: .8rem; }
+  .article-videos { max-width: 980px; margin: 50px auto 0; }
+  .video-heading small { color: var(--gold); font-weight: 900; letter-spacing: .14em; }
+  .video-heading h2 { margin: 6px 0 18px; font-size: clamp(1.55rem,3vw,2rem); }
+  .video-grid { display: grid; gap: 22px; }
+  .video-card { margin: 0; overflow: hidden; background: white; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); }
+  .video-frame { position: relative; width: 100%; padding-top: 56.25%; background: #071623; }
+  .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .video-card figcaption { display: flex; align-items: center; gap: 12px; padding: 14px 18px; }
+  .video-card figcaption span { color: var(--gold); font-size: .75rem; font-weight: 900; }
+  .video-card figcaption strong { color: var(--navy); }
+  .video-card figcaption a { margin-left: auto; color: var(--navy); font-size: .8rem; font-weight: 800; }
   .article-bottom { max-width: 880px; margin: 60px auto 0; padding-top: 28px; border-top: 1px solid var(--line); }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tags a { padding: 6px 12px; color: var(--navy); background: var(--gold-soft); border-radius: 999px; font-size: .78rem; }
