@@ -51,8 +51,6 @@ const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
     </div>
   </section>
 
-  <HomeUpgrade observations={observations} />
-
   <section class="section">
     <div class="container">
       <div class="section-head">
@@ -73,6 +71,8 @@ const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
     </div>
   </section>
 
+  <HomeUpgrade section="observations" observations={observations} />
+
   {latestVideoArticle && latestVideo && <section class="section latest-video">
     <div class="container">
       <div class="section-head"><div><p class="eyebrow">LATEST VIDEO</p><h2>最新上架影片</h2></div><a class="button" href={`${base}categories/ai-media/`}>更多自媒體內容</a></div>
@@ -80,6 +80,11 @@ const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
     </div>
   </section>
 }
+
+  <HomeUpgrade section="trust" />
+  <HomeUpgrade section="resources" />
+  <HomeUpgrade section="faq" />
+  <HomeUpgrade section="needs" />
   
   <section class="section latest">
     <div class="container">
@@ -115,13 +120,13 @@ const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
   .search-panel strong { color: #1458a6; }
   .search-panel span { color: rgba(15,45,76,.7); }
   .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
-  .category { position: relative; min-height: 285px; padding: 25px; border: 1px solid var(--line); background: white; border-radius: var(--radius); overflow: hidden; transition: .22s; }
+  .category { position: relative; min-height: 220px; padding: 20px; border: 1px solid var(--line); background: white; border-radius: var(--radius); overflow: hidden; transition: .22s; }
   .category:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: var(--shadow); }
-  .number { position: absolute; right: 22px; top: 18px; color: #d8dee2; font-family: serif; font-size: 2.5rem; }
-  .icon { display: grid; width: 46px; height: 46px; place-items: center; color: white; background: var(--navy); border-radius: 14px; font-weight: 900; }
-  .category h3 { margin: 30px 0 8px; font-size: 1.28rem; }
-  .category p { color: var(--muted); font-size: .9rem; }
-  .category b { position: absolute; bottom: 22px; color: var(--gold); font-size: .82rem; }
+  .number { position: absolute; right: 18px; top: 14px; color: #d8dee2; font-family: serif; font-size: 2.15rem; }
+  .icon { display: grid; width: 42px; height: 42px; place-items: center; color: white; background: var(--navy); border-radius: 14px; font-weight: 900; }
+  .category h3 { margin: 18px 0 6px; font-size: 1.5rem; }
+  .category p { margin: 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
+  .category b { position: absolute; bottom: 16px; color: var(--gold); font-size: .92rem; }
   .latest-video { background: linear-gradient(135deg,#eef8ff,#fff9e9); }
   .video-feature { display: grid; grid-template-columns: 1.25fr .75fr; gap: 28px; align-items: stretch; }
   .home-video-frame { position: relative; min-height: 420px; overflow: hidden; background: #071623; border-radius: 24px; box-shadow: var(--shadow); }
