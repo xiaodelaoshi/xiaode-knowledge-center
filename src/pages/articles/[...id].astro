@@ -1,4 +1,4 @@
----
+﻿---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { categoryByName } from '../../data/site';
@@ -21,6 +21,7 @@ const previousArticle = currentIndex >= 0 ? allArticles[currentIndex + 1] : unde
 const nextArticle = currentIndex > 0 ? allArticles[currentIndex - 1] : undefined;
 const stableNumber = (value: string) => Array.from(value).reduce((total, char) => ((total * 31) + (char.codePointAt(0) ?? 0)) >>> 0, 7);
 const currentTags = new Set(article.data.tags);
+const isHighStakes = article.data.category === '稅務與法律';
 const relatedArticles = allArticles.filter((item) => item.id !== article.id).map((item) => ({
   item,
   score: (item.data.tags.filter((tag) => currentTags.has(tag)).length * 10) + (item.data.category === article.data.category ? 3 : 0),
@@ -79,6 +80,11 @@ const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'Breadcrum
         <div class="video-heading"><small>WATCH</small><h2 id="video-title">影音內容</h2></div>
         <div class="video-grid">{videoEmbeds.map((video) => video && <figure class="video-card"><div class="video-frame"><iframe src={video.src} title={video.title ?? video.label + ' 影片'} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><figcaption><span>{video.label}</span>{video.title && <strong>{video.title}</strong>}<a href={video.url} target="_blank" rel="noreferrer">前往原平台觀看 ↗</a></figcaption></figure>)}</div>
       </section>}
+      <aside class="article-trust">
+        <div><small>小德老師知識中心</small><strong>作者：小德老師</strong><p>內容由第一線實務與公開資料整理，希望讓複雜問題更容易理解。</p></div>
+        <a class="button" href={`${base}about/`}>認識作者</a>
+      </aside>
+      {isHighStakes && <aside class="legal-note"><strong>重要提醒</strong><p>稅務與法律規則會因取得時間、契約、證據與個案事實而不同；本文僅供初步知識整理，做出重要決定前請再確認專業意見與最新規定。</p></aside>}
       <div class="article-bottom">
         <div class="tags">
           {article.data.tags.map((tag) => <a href={`${base}tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}
@@ -121,6 +127,12 @@ const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'Breadcrum
   .video-card figcaption span { color: var(--gold); font-size: .75rem; font-weight: 900; }
   .video-card figcaption strong { color: var(--navy); }
   .video-card figcaption a { margin-left: auto; color: var(--navy); font-size: .8rem; font-weight: 800; }
+  .article-trust { display:flex; justify-content:space-between; gap:24px; align-items:center; max-width:880px; margin:42px auto 0; padding:24px; border:1px solid var(--line); background:linear-gradient(135deg,#f2f9ff,#fff); border-radius:18px; }
+  .article-trust small { display:block; color:var(--gold); font-size:.75rem; font-weight:900; letter-spacing:.1em; }
+  .article-trust strong { display:block; margin-top:5px; color:var(--navy); }
+  .article-trust p { max-width:590px; margin:4px 0 0; color:var(--muted); font-size:.86rem; }
+  .legal-note { max-width:880px; margin:18px auto 0; padding:18px 22px; border-left:4px solid var(--gold); background:var(--gold-soft); border-radius:0 14px 14px 0; }
+  .legal-note p { margin:5px 0 0; color:#5e5139; font-size:.88rem; }
   .article-bottom { max-width: 880px; margin: 60px auto 0; padding-top: 28px; border-top: 1px solid var(--line); }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tags a { padding: 6px 12px; color: var(--navy); background: var(--gold-soft); border-radius: 999px; font-size: .78rem; }
@@ -148,3 +160,5 @@ const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'Breadcrum
   @media(max-width:760px){.related-grid,.article-nav{grid-template-columns:1fr}.related-card{min-height:auto}.article-nav a.next{text-align:left;align-items:flex-start}}
   @media(max-width:600px){.share,.comment-head{align-items:flex-start;flex-direction:column}.comments{padding:18px}}
 </style>
+
+
