@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const base = import.meta.env.BASE_URL;
 const downloads = { buying: '買房看房檢查清單.txt', selling: '賣房準備清單.txt', accident: '交通事故初步處理卡.txt' };
 const buyingDownloads = { word: '買房看屋檢查清單_台灣版.docx', pdf: '買房看屋檢查清單_台灣版.pdf' };
+const sellingDownloads = { word: '賣房準備清單_台灣屋主版.docx', pdf: '賣房準備清單_台灣屋主版.pdf' };
 const resources = [
   { id: 'buying', number: '01', title: '買房看房檢查清單', intro: '帶看時不只看裝潢，這些條件也要記下來。', items: ['屋況：採光、通風、漏水痕跡與管線狀況', '環境：噪音、採買、停車、通勤與日夜差異', '文件：坪數、格局、管理費、屋齡與交易條件'], article: '第一次看房先看什麼' },
   { id: 'selling', number: '02', title: '賣房準備清單', intro: '先把條件整理好，才能讓定價與溝通更有效率。', items: ['整理權狀、稅單、格局與修繕紀錄', '盤點出售原因、交屋時間與價格底線', '提前處理影響看屋的雜物、屋況與居住安排'], article: '屋主已經委託別家怎麼談' },
@@ -11,7 +12,7 @@ const resources = [
 ---
 <BaseLayout title="免費實用資源" description="小德老師知識中心提供買房、賣房與交通事故的免費實用清單。">
   <section class="resource-hero"><div class="container"><p class="eyebrow">FREE RESOURCES</p><h1>把複雜的事，<br/>整理成一張能用的清單。</h1><p>這些資源以知識整理為目的，適合先存下來、需要時再回來看。</p></div></section>
-  <section class="section"><div class="container cards">{resources.map((resource) => <article id={resource.id}><span>{resource.number}</span><h2>{resource.title}</h2><p>{resource.intro}</p><ul>{resource.items.map((item) => <li>{item}</li>)}</ul><div class="actions"><button class="button primary" data-resource={resource.title}>複製清單</button><a class="button" href={`${base}downloads/${downloads[resource.id as keyof typeof downloads]}`} download>下載文字版</a>{resource.id === 'buying' && <><a class="button file-word" href={`${base}downloads/${buyingDownloads.word}`} download>下載 Word 版</a><a class="button file-pdf" href={`${base}downloads/${buyingDownloads.pdf}`} download>下載 PDF 版</a></>}<a class="button" href={`${base}search/?q=${encodeURIComponent(resource.article)}`}>閱讀相關文章</a></div></article>)}</div></section>
+  <section class="section"><div class="container cards">{resources.map((resource) => <article id={resource.id}><span>{resource.number}</span><h2>{resource.title}</h2><p>{resource.intro}</p><ul>{resource.items.map((item) => <li>{item}</li>)}</ul><div class="actions"><button class="button primary" data-resource={resource.title}>複製清單</button><a class="button" href={`${base}downloads/${downloads[resource.id as keyof typeof downloads]}`} download>下載文字版</a>{resource.id === 'buying' && <><a class="button file-word" href={`${base}downloads/${buyingDownloads.word}`} download>下載 Word 版</a><a class="button file-pdf" href={`${base}downloads/${buyingDownloads.pdf}`} download>下載 PDF 版</a></>}{resource.id === 'selling' && <><a class="button file-word" href={`${base}downloads/${sellingDownloads.word}`} download>下載 Word 版</a><a class="button file-pdf" href={`${base}downloads/${sellingDownloads.pdf}`} download>下載 PDF 版</a></>}<a class="button" href={`${base}search/?q=${encodeURIComponent(resource.article)}`}>閱讀相關文章</a></div></article>)}</div></section>
 </BaseLayout>
 <script>
   document.querySelectorAll<HTMLButtonElement>('[data-resource]').forEach((button) => {
