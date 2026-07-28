@@ -1,8 +1,22 @@
----
+﻿---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../data/site';
 ---
-<BaseLayout title="聯絡小德老師">
-  <section class="contact"><div class="container grid"><div><p class="eyebrow">LET'S CONNECT</p><h1>有問題，<br />我們慢慢聊。</h1><p>歡迎透過 Facebook、Instagram 或 LINE 與小德老師聯絡。第一版先使用社群平台聯絡；之後可再加入表單、預約與電子報。</p></div><div class="channels"><a href={site.social.facebook} target="_blank" rel="noreferrer"><b>Facebook</b><span>前往主帳號 →</span></a><a class="pending" href={site.social.instagram}><b>Instagram</b><span>連結待補</span></a><a class="pending" href={site.social.line}><b>LINE 官方帳號</b><span>連結待補</span></a></div></div></section>
+<BaseLayout title="聯絡小德老師" description="透過 Messenger 與小德老師聯絡，先整理你的買房、賣房、法律或合作需求。">
+  <section class="contact"><div class="container grid"><div><p class="eyebrow">LET'S CONNECT</p><h1>有問題，<br/>我們慢慢聊。</h1><p>你可以先把需求整理好，再用 Messenger 私訊小德老師。這能讓我們更快進入重點，也避免公開留下個人資料。</p><a class="button primary" href="https://m.me/zhuang.xiao.de.463208" target="_blank" rel="noreferrer">直接私訊 Messenger</a></div><div class="contact-card"><p class="eyebrow">QUICK BRIEF</p><h2>先整理你的需求</h2><form id="contact-brief"><label>你想討論的主題<select name="topic"><option>買房或賣房</option><option>稅務或法律知識</option><option>交通事故相關</option><option>房仲、管理或 AI 合作</option><option>其他問題</option></select></label><label>你的情況或問題<textarea name="message" rows="5" placeholder="例如：想了解繼承房屋出售前，還需要先確認哪些條件？"></textarea></label><label>方便聯絡的方式（可選）<input name="contact" placeholder="例如：姓名、電話或可聯絡的時間" /></label><button class="button primary" type="submit">複製需求並開啟 Messenger</button><small id="brief-status">送出前會先複製內容；開啟 Messenger 後貼上即可，不會由網站保存資料。</small></form></div></div></section>
+  <section class="section"><div class="container contact-note"><h2>聯絡前的小提醒</h2><p>法律與稅務案件的細節差異很大，建議先準備取得日期、相關文件與你最想確認的問題。網站內容可作為初步理解，個別案件仍應依專業意見判斷。</p></div></section>
 </BaseLayout>
-<style>.contact{padding:120px 0;background:linear-gradient(135deg,#f1eadf,#fff)}.grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:80px;align-items:center}.contact h1{font-size:clamp(2.7rem,6vw,4.8rem)}.contact p{max-width:540px;color:var(--muted)}.channels{display:grid;gap:14px}.channels a{display:flex;justify-content:space-between;align-items:center;padding:24px;border:1px solid var(--line);background:white;border-radius:18px;box-shadow:0 10px 30px rgba(23,54,83,.06)}.channels a:hover{border-color:var(--gold)}.channels span{color:var(--gold);font-size:.85rem}.channels .pending{opacity:.6;pointer-events:none}@media(max-width:760px){.contact{padding:80px 0}.grid{grid-template-columns:1fr;gap:35px}}</style>
+<script>
+  const form = document.querySelector<HTMLFormElement>('#contact-brief');
+  const status = document.querySelector<HTMLElement>('#brief-status');
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const brief = `您好，我想和小德老師討論：\n主題：${data.get('topic')}\n問題：${data.get('message') || '（尚未填寫）'}\n聯絡方式：${data.get('contact') || '（未提供）'}`;
+    try { await navigator.clipboard.writeText(brief); status!.textContent = '需求內容已複製，請在 Messenger 對話框貼上後送出。'; } catch { status!.textContent = '請手動複製填寫內容後，在 Messenger 傳送。'; }
+    window.open('https://m.me/zhuang.xiao.de.463208', '_blank', 'noopener,noreferrer');
+  });
+</script>
+<style>
+.contact{padding:110px 0;background:linear-gradient(135deg,#eaf6ff,#fff8e9)}.grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:70px;align-items:center}.contact h1{font-size:clamp(2.7rem,6vw,4.8rem)}.contact p{max-width:540px;color:var(--muted)}.contact-card{padding:32px;border:1px solid var(--line);background:#fff;border-radius:24px;box-shadow:var(--shadow)}.contact-card h2{margin:0 0 18px;font-size:1.7rem}.contact-card form{display:grid;gap:14px}.contact-card label{display:grid;gap:6px;color:var(--navy);font-size:.9rem;font-weight:800}.contact-card input,.contact-card select,.contact-card textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-weight:400}.contact-card textarea{resize:vertical}.contact-card small{color:var(--muted);font-size:.78rem}.contact-note{max-width:820px;text-align:center}.contact-note p{color:var(--muted)}@media(max-width:760px){.contact{padding:80px 0}.grid{grid-template-columns:1fr;gap:35px}.contact-card{padding:22px}}
+</style>

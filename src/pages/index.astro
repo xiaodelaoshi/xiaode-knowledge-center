@@ -1,14 +1,24 @@
----
+﻿---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchHero from '../components/SearchHero.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import HomeUpgrade from '../components/HomeUpgrade.astro';
 import { categories, site } from '../data/site';
 const base = import.meta.env.BASE_URL;
 const articles = (await getCollection('articles', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
 const featured = articles.filter(({ data }) => data.featured).slice(0, 3);
-const videoArticles = articles.filter(({ data }) => data.videos.length > 0);
+const observations = articles.filter(({ data }) => ['房地產知識', '稅務與法律'].includes(data.category)).slice(0, 3);
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: '稅務或法律問題，可以直接以網站內容作為個案結論嗎？', acceptedAnswer: { '@type': 'Answer', text: '不建議。網站內容用於協助讀者掌握方向與準備問題；個案仍應依時間、契約與相關資料，向合適的專業人士確認。' } },
+    { '@type': 'Question', name: '第一次買房或賣房，該從哪裡開始？', acceptedAnswer: { '@type': 'Answer', text: '可以先使用買房或賣房清單，整理預算、需求與時程，再閱讀網站的相關文章，逐步釐清下一步。' } },
+    { '@type': 'Question', name: '找不到需要的主題怎麼辦？', acceptedAnswer: { '@type': 'Answer', text: '可使用首頁搜尋，或將問題整理後透過聯絡頁的 Messenger 與小德老師交流。' } },
+  ],
+};const videoArticles = articles.filter(({ data }) => data.videos.length > 0);
 const latestVideoArticle = videoArticles[0];
 const latestVideo = latestVideoArticle?.data.videos[0];
 const toHomeEmbed = (video: { platform: string; url: string }) => {
@@ -30,6 +40,7 @@ const toHomeEmbed = (video: { platform: string; url: string }) => {
 const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
 ---
 <BaseLayout>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   <section class="hero" aria-label="小德老師知識中心品牌封面">
     <h1 class="sr-only">小德老師知識中心｜房地產、稅務法律、房仲實戰、經營管理與 AI 自媒體</h1>
   </section>
@@ -39,6 +50,8 @@ const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
       <SearchHero />
     </div>
   </section>
+
+  <HomeUpgrade observations={observations} />
 
   <section class="section">
     <div class="container">
@@ -136,3 +149,8 @@ const latestVideoEmbed = latestVideo ? toHomeEmbed(latestVideo) : '';
   @media (max-width: 850px) { .hero { min-height: min(760px, 104vw); } }
   @media (max-width: 560px) { .hero { min-height: 104vw; } .hero-search-section { padding: 12px 0 18px; } .search-panel { padding: 10px 12px 14px; border-radius: 18px; background: rgba(255,255,255,.76); } .search-panel > p { align-items: center; flex-direction: column; gap: 0; font-size: .82rem; } .category-grid, .article-grid { grid-template-columns: 1fr; } }
 </style>
+
+
+
+
+
