@@ -5,7 +5,7 @@ export const site = {
   social: {
     facebook: 'https://www.facebook.com/zhuang.xiao.de.463208?locale=zh_TW',
     instagram: '#',
-    line: '#',
+    line: 'https://lin.ee/qPDcFfR',
   },
 };
 
