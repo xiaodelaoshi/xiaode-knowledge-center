@@ -5,9 +5,10 @@ export const site = {
   social: {
     facebook: 'https://www.facebook.com/zhuang.xiao.de.463208?locale=zh_TW',
     instagram: '#',
-    line: 'https://lin.ee/qPDcFfR',
+    line: 'https://lin.ee/Pdh8Ag9',
   },
 };
+
 
 export const categories = [
   { name: '房地產知識', slug: 'real-estate', icon: '屋', description: '買房、賣房、換屋與看房的實用判斷。' },
@@ -18,6 +19,8 @@ export const categories = [
   { name: '親子與人生觀點', slug: 'life', icon: '心', description: '關於家庭、成長、生活與選擇的真實分享。' },
 ] as const;
 
+
 export function categoryByName(name: string) {
   return categories.find((category) => category.name === name);
 }
+
